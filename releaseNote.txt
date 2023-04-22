@@ -1,0 +1,10 @@
+Functions/data sofar..
+allow input of least uncomfortable (target) joint angles and height
+hide in-frame likelyhood, by default
+talks
+
+TODO
+compute and handle deltas between current and optima joint angles
+
+FIXME
+

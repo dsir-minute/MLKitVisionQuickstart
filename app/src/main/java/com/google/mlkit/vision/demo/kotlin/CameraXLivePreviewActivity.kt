@@ -16,6 +16,7 @@
 
 package com.google.mlkit.vision.demo.kotlin
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
@@ -23,14 +24,8 @@ import android.speech.tts.TextToSpeech
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.View
-import android.widget.AdapterView
+import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.ArrayAdapter
-import android.widget.CompoundButton
-import android.widget.ImageView
-import android.widget.Spinner
-import android.widget.Toast
-import android.widget.ToggleButton
 import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraInfoUnavailableException
 import androidx.camera.core.CameraSelector
@@ -45,10 +40,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.common.annotation.KeepName
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.common.model.LocalModel
-import com.google.mlkit.vision.demo.CameraXViewModel
-import com.google.mlkit.vision.demo.GraphicOverlay
-import com.google.mlkit.vision.demo.R
-import com.google.mlkit.vision.demo.VisionImageProcessor
+import com.google.mlkit.vision.demo.*
 import com.google.mlkit.vision.demo.kotlin.barcodescanner.BarcodeScannerProcessor
 import com.google.mlkit.vision.demo.kotlin.facedetector.FaceDetectorProcessor
 import com.google.mlkit.vision.demo.kotlin.labeldetector.LabelDetectorProcessor
@@ -68,6 +60,7 @@ import com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -101,6 +94,7 @@ class CameraXLivePreviewActivity :
     val currentAngles = DoubleArray(SkeletalJoint.values().size)
     val numAngleVals = IntArray(SkeletalJoint.values().size) // number of measured values sofar
     val jointsNames = arrayOf("EYE", "SHOULDER", "elbow", "WRIST", "hip", "knee", "ANKLE")
+    var personHeight: Int = 0
     var tts: TextToSpeech? = null
     var globalVar="i am global"
   }
@@ -177,6 +171,10 @@ class CameraXLivePreviewActivity :
       intent.putExtra(SettingsActivity.EXTRA_LAUNCH_SOURCE, LaunchSource.CAMERAX_LIVE_PREVIEW)
       startActivity(intent)
     }
+    val settingsButton2 = findViewById<ImageView>(R.id.settings_button2)
+    settingsButton2.setOnClickListener {
+      getUserInputs(it)
+    }
 
     tts = TextToSpeech(this, this)
 
@@ -248,6 +246,43 @@ class CameraXLivePreviewActivity :
   public override fun onDestroy() {
     super.onDestroy()
     imageProcessor?.run { this.stop() }
+  }
+
+  fun getUserInputs(view: View){
+    val builder = AlertDialog.Builder(this)
+    // set the custom layout
+    val dialogView = layoutInflater.inflate(R.layout.user_inputs_dialog, null)
+    builder.setView(dialogView)
+    // create and show the alert dialog
+    val dialog = builder.create()
+    val okBtn = dialogView.findViewById(R.id.okBtn) as Button
+    var heightView : TextView = dialogView.findViewById(R.id.height) as TextView
+    var elbowAngleView : TextView = dialogView.findViewById(R.id.elbow_angle) as TextView
+    var kneeAngleView : TextView = dialogView.findViewById(R.id.knee_angle) as TextView
+    var signatureView : TextView = dialogView.findViewById(R.id.signature) as TextView
+
+    val dateFormat = SimpleDateFormat("ddMMMyyyy HH:mm")
+    val buildDate = dateFormat.format(Date(BuildConfig.BUILD_DATE))
+    signatureView.text = "app build date: %s".format( buildDate)
+
+    okBtn.setOnClickListener {
+      dialog.dismiss()
+      // ...and process inputs
+      var tmpString = heightView.text.toString()
+      personHeight = if (tmpString.length > 0) tmpString.toInt() else 0
+      tmpString = elbowAngleView.text.toString()
+      optimumAngles[SkeletalJoint.ELBOW.ordinal] = if( tmpString.length>0) tmpString.toInt() else 0
+      tmpString = kneeAngleView.text.toString()
+      optimumAngles[SkeletalJoint.KNEE.ordinal] = if( tmpString.length>0) tmpString.toInt() else 0
+      /*
+      Toast.makeText(this,
+          "got height %d, elbow %d°, knee %d°".format( personHeight, optimumAngles[SkeletalJoint.ELBOW.ordinal], optimumAngles[SkeletalJoint.KNEE.ordinal]),
+          Toast.LENGTH_SHORT)
+      .show()
+       */
+      tts!!.speak("awesome! now I know your height. thank you!", TextToSpeech.QUEUE_FLUSH, null,"")
+    }
+    dialog.show()
   }
 
   private fun bindAllCameraUseCases() {

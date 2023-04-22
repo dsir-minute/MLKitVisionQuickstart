@@ -211,11 +211,9 @@ public class PreferenceUtils {
     boolean enableFaceTracking =
         sharedPreferences.getBoolean(
             context.getString(R.string.pref_key_live_preview_face_detection_face_tracking), false);
-    float minFaceSize =
-        Float.parseFloat(
+    float minFaceSize = Float.parseFloat(
             sharedPreferences.getString(
-                context.getString(R.string.pref_key_live_preview_face_detection_min_face_size),
-                "0.1"));
+                context.getString(R.string.pref_key_live_preview_face_detection_min_face_size),"0.1"));
 
     FaceDetectorOptions.Builder optionsBuilder =
         new FaceDetectorOptions.Builder()
@@ -231,6 +229,8 @@ public class PreferenceUtils {
   }
 
   public static PoseDetectorOptionsBase getPoseDetectorOptionsForLivePreview(Context context) {
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    float kneeAngle = Float.parseFloat(sharedPreferences.getString(context.getString(R.string.pref_key_live_preview_target_knee_angle),"115"));
     int performanceMode =
         getModeTypePreferenceValue(
             context,

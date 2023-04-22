@@ -60,6 +60,7 @@
         android:textColor="#FFF"
         android:textSize="16sp"
         android:text="@string/custom_object_detection"/>
+
   </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

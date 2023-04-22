@@ -16,17 +16,17 @@
 
 package com.google.mlkit.vision.demo.kotlin
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.util.Size
-import android.widget.CompoundButton
-import android.widget.ImageView
-import android.widget.Toast
-import android.widget.ToggleButton
+import android.view.View
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.camera.view.PreviewView
 import com.google.android.gms.common.annotation.KeepName
@@ -34,6 +34,7 @@ import com.google.mlkit.common.model.LocalModel
 import com.google.mlkit.vision.camera.CameraSourceConfig
 import com.google.mlkit.vision.camera.CameraXSource
 import com.google.mlkit.vision.camera.DetectionTaskCallback
+import com.google.mlkit.vision.demo.BuildConfig
 import com.google.mlkit.vision.demo.GraphicOverlay
 import com.google.mlkit.vision.demo.InferenceInfoGraphic
 import com.google.mlkit.vision.demo.R
@@ -45,8 +46,11 @@ import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
-import java.util.Objects
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.List
+
+enum class SkeletalJoint { EYE, SHOULDER, ELBOW, WRIST, HIP, KNEE, ANKLE }
 
 /** Live preview demo app for ML Kit APIs using CameraXSource API. */
 @KeepName
