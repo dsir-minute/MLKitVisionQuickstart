@@ -9,15 +9,19 @@ derived from https://github.com/googlesamples/mlkit/tree/master/android/vision-q
 - use buildconfig consts
 - add side selector in settings
 - show landmarks on selected side only
-TODO:
 - get person's height
-- get target/optimal knee and elbow angles
-- process height and optimum angles
 - tts prepared (https://www.tutorialkart.com/kotlin-android/android-text-to-speech-kotlin-example/)
+- get target/optimal hup, knee and elbow angles; does tts
+- hide in-frame likelyhood, by default
 - long tap somewhere to quit
-- play starting sounds (https://www.geeksforgeeks.org/how-to-play-audio-from-url-in-android/, https://stackoverflow.com/questions/7499605/how-to-play-the-audio-files-directly-from-res-raw-folder)
 - compute and display elbow angle
 - compute and display knee angle
+- compute and display hip angle
+- updated .gitignore
+
+TODO:
+- process height and optimum angles
+- play starting sounds (https://www.geeksforgeeks.org/how-to-play-audio-from-url-in-android/, https://stackoverflow.com/questions/7499605/how-to-play-the-audio-files-directly-from-res-raw-folder)
 - portrait locked
 - non flickering display of cumulative averages of elbow & knee angles
 - new tools icon, show optima angles near current ones

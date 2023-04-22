@@ -90,11 +90,11 @@ class CameraXLivePreviewActivity :
     private const val FACE_MESH_DETECTION = "Face Mesh Detection (Beta)";
     private const val STATE_SELECTED_MODEL = "selected_model"
 
-    val optimumAngles = IntArray(SkeletalJoint.values().size)
+    val optimumAngles = IntArray(SkeletalJoint.values().size) // in degrees
     val currentAngles = DoubleArray(SkeletalJoint.values().size)
     val numAngleVals = IntArray(SkeletalJoint.values().size) // number of measured values sofar
     val jointsNames = arrayOf("EYE", "SHOULDER", "elbow", "WRIST", "hip", "knee", "ANKLE")
-    var personHeight: Int = 0
+    var personHeight: Int = 0 // in cm
     var tts: TextToSpeech? = null
     var globalVar="i am global"
   }
@@ -248,6 +248,12 @@ class CameraXLivePreviewActivity :
     imageProcessor?.run { this.stop() }
   }
 
+  fun initOptimaAngles(){
+    optimumAngles[SkeletalJoint.KNEE.ordinal] = 115 // 95..135
+    optimumAngles[SkeletalJoint.HIP.ordinal] = 105 // 95..120
+    optimumAngles[SkeletalJoint.ELBOW.ordinal] = 120 // 80..170
+  }
+
   fun getUserInputs(view: View){
     val builder = AlertDialog.Builder(this)
     // set the custom layout
@@ -259,11 +265,17 @@ class CameraXLivePreviewActivity :
     var heightView : TextView = dialogView.findViewById(R.id.height) as TextView
     var elbowAngleView : TextView = dialogView.findViewById(R.id.elbow_angle) as TextView
     var kneeAngleView : TextView = dialogView.findViewById(R.id.knee_angle) as TextView
+    var hipAngleView : TextView = dialogView.findViewById(R.id.hip_angle) as TextView
     var signatureView : TextView = dialogView.findViewById(R.id.signature) as TextView
 
     val dateFormat = SimpleDateFormat("ddMMMyyyy HH:mm")
     val buildDate = dateFormat.format(Date(BuildConfig.BUILD_DATE))
     signatureView.text = "app build date: %s".format( buildDate)
+
+    heightView.setText(personHeight.toString())
+    elbowAngleView.setText(optimumAngles[SkeletalJoint.ELBOW.ordinal].toString())
+    kneeAngleView.setText(optimumAngles[SkeletalJoint.KNEE.ordinal].toString())
+    hipAngleView.setText(optimumAngles[SkeletalJoint.HIP.ordinal].toString())
 
     okBtn.setOnClickListener {
       dialog.dismiss()
@@ -271,9 +283,11 @@ class CameraXLivePreviewActivity :
       var tmpString = heightView.text.toString()
       personHeight = if (tmpString.length > 0) tmpString.toInt() else 0
       tmpString = elbowAngleView.text.toString()
-      optimumAngles[SkeletalJoint.ELBOW.ordinal] = if( tmpString.length>0) tmpString.toInt() else 0
+      if( tmpString.length>0) optimumAngles[SkeletalJoint.ELBOW.ordinal] = tmpString.toInt()
       tmpString = kneeAngleView.text.toString()
-      optimumAngles[SkeletalJoint.KNEE.ordinal] = if( tmpString.length>0) tmpString.toInt() else 0
+      if( tmpString.length>0) optimumAngles[SkeletalJoint.KNEE.ordinal] = tmpString.toInt()
+      tmpString = hipAngleView.text.toString()
+      if( tmpString.length>0) optimumAngles[SkeletalJoint.HIP.ordinal] = tmpString.toInt()
       /*
       Toast.makeText(this,
           "got height %d, elbow %d°, knee %d°".format( personHeight, optimumAngles[SkeletalJoint.ELBOW.ordinal], optimumAngles[SkeletalJoint.KNEE.ordinal]),
@@ -474,6 +488,8 @@ class CameraXLivePreviewActivity :
   }
 
   override fun onInit(status: Int) {
+    initOptimaAngles()
+
     if (status == TextToSpeech.SUCCESS) {
       // set US English as language for tts
       val result = tts!!.setLanguage(Locale.US)
