@@ -35,7 +35,7 @@ android {
         }
         debug {
             isDefault true
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles 'proguard-rules.pro'
         }
         testBuildType "debug"

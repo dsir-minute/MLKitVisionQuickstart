@@ -90,7 +90,7 @@ class CameraXLivePreviewActivity :
     private const val FACE_MESH_DETECTION = "Face Mesh Detection (Beta)";
     private const val STATE_SELECTED_MODEL = "selected_model"
 
-    val optimumAngles = IntArray(SkeletalJoint.values().size) // in degrees
+    val optimumAngles = DoubleArray(SkeletalJoint.values().size) // in degrees
     val currentAngles = DoubleArray(SkeletalJoint.values().size)
     val numAngleVals = IntArray(SkeletalJoint.values().size) // number of measured values sofar
     val jointsNames = arrayOf("EYE", "SHOULDER", "elbow", "WRIST", "hip", "knee", "ANKLE")
@@ -249,9 +249,9 @@ class CameraXLivePreviewActivity :
   }
 
   fun initOptimaAngles(){
-    optimumAngles[SkeletalJoint.KNEE.ordinal] = 115 // 95..135
-    optimumAngles[SkeletalJoint.HIP.ordinal] = 105 // 95..120
-    optimumAngles[SkeletalJoint.ELBOW.ordinal] = 120 // 80..170
+    optimumAngles[SkeletalJoint.KNEE.ordinal] = 115.0 // 95..135
+    optimumAngles[SkeletalJoint.HIP.ordinal] = 105.0 // 95..120
+    optimumAngles[SkeletalJoint.ELBOW.ordinal] = 120.0 // 80..170
   }
 
   fun getUserInputs(view: View){
@@ -283,11 +283,11 @@ class CameraXLivePreviewActivity :
       var tmpString = heightView.text.toString()
       personHeight = if (tmpString.length > 0) tmpString.toInt() else 0
       tmpString = elbowAngleView.text.toString()
-      if( tmpString.length>0) optimumAngles[SkeletalJoint.ELBOW.ordinal] = tmpString.toInt()
+      if( tmpString.length>0) optimumAngles[SkeletalJoint.ELBOW.ordinal] = tmpString.toDouble()
       tmpString = kneeAngleView.text.toString()
-      if( tmpString.length>0) optimumAngles[SkeletalJoint.KNEE.ordinal] = tmpString.toInt()
+      if( tmpString.length>0) optimumAngles[SkeletalJoint.KNEE.ordinal] = tmpString.toDouble()
       tmpString = hipAngleView.text.toString()
-      if( tmpString.length>0) optimumAngles[SkeletalJoint.HIP.ordinal] = tmpString.toInt()
+      if( tmpString.length>0) optimumAngles[SkeletalJoint.HIP.ordinal] = tmpString.toDouble()
       /*
       Toast.makeText(this,
           "got height %d, elbow %d°, knee %d°".format( personHeight, optimumAngles[SkeletalJoint.ELBOW.ordinal], optimumAngles[SkeletalJoint.KNEE.ordinal]),
@@ -429,7 +429,7 @@ class CameraXLivePreviewActivity :
             PoseDetectorProcessor(
               this,
               poseDetectorOptions,
-              shouldShowInFrameLikelihood,
+              false, // shouldShowInFrameLikelihood
               visualizeZ,
               rescaleZ,
               runClassification,

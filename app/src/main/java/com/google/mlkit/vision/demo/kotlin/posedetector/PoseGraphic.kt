@@ -52,6 +52,7 @@ internal constructor(
     private val STROKE_WIDTH = 10.0f
     private val POSE_CLASSIFICATION_TEXT_SIZE = 60.0f
     val MIN_LIKELYHOOD = .8F
+    val jointNAME = arrayOf ( "eye", "shoulder", "elbow", "wrist", "hip", "knee", "ankle")
   }
 
   private var zMin = java.lang.Float.MAX_VALUE
@@ -92,6 +93,21 @@ internal constructor(
     return angleDeg
   }
 
+  internal fun sayAdvice( jointIndex: Int, increaseAction: String, decreaseAction: String): String{
+    // start w/ knee angle, how far is it from ideal 95--135 ?
+    var toSay: String = "";
+    val jointAngleNow = CameraXLivePreviewActivity.currentAngles[jointIndex]
+    toSay += " at %.0f degrees, your %s angle is".format( jointAngleNow, jointNAME[jointIndex])
+    if( jointAngleNow < (CameraXLivePreviewActivity.optimumAngles[jointIndex] - 5.0)) {
+      toSay += " too narrow, please %s a little bit. ".format( increaseAction)
+    } else if( jointAngleNow > (CameraXLivePreviewActivity.optimumAngles[jointIndex] + 5.0)) {
+      toSay += " too wide, please %s a little bit. ".format( decreaseAction)
+    } else {
+      toSay += " already good! ".format( jointNAME[jointIndex])
+    }
+    return toSay
+  }
+
   internal fun drawAngle(canvas: Canvas, jointIndex: Int, lm1: PoseLandmark, lm2 : PoseLandmark, lm3: PoseLandmark){
     if( lm1.inFrameLikelihood < MIN_LIKELYHOOD)
       return
@@ -111,7 +127,11 @@ internal constructor(
     }
     ++CameraXLivePreviewActivity.numAngleVals[jointIndex]
     if( (jointIndex == SkeletalJoint.KNEE.ordinal) && (CameraXLivePreviewActivity.numAngleVals[jointIndex] == 40) ){
-      CameraXLivePreviewActivity.tts!!.speak("OK! now, I am ready to get you to an optimal posture. Please reach the seat buttons with your left hand!", TextToSpeech.QUEUE_FLUSH, null,"")
+      var toSay = "OK! here is my advice to get you to an optimal posture : "
+      toSay += sayAdvice( SkeletalJoint.KNEE.ordinal, "move backward", "move forward")
+      toSay += sayAdvice( SkeletalJoint.HIP.ordinal, "recline backward", "recline forward")
+//      sayAdvice( SkeletalJoint.KNEE.ordinal, "move backward", "move forward")
+      CameraXLivePreviewActivity.tts!!.speak(toSay, TextToSpeech.QUEUE_FLUSH, null,"")
     }
     canvas.drawText(
       "%d %s %.0f°".format( CameraXLivePreviewActivity.numAngleVals[jointIndex], CameraXLivePreviewActivity.jointsNames[jointIndex], CameraXLivePreviewActivity.currentAngles[jointIndex]),
