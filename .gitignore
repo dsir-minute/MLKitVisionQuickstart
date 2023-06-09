@@ -28,7 +28,7 @@
 *.ipr
 
 # eclipse project file
-.settings/
+.settings//
 .classpath
 .project
 
@@ -40,3 +40,4 @@
 release.properties
 pom.xml.releaseBackup
 pom.xml.tag
+*.iml

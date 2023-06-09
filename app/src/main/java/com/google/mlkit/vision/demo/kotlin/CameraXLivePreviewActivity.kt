@@ -172,7 +172,7 @@ class CameraXLivePreviewActivity :
       startActivity(intent)
     }
     val settingsButton2 = findViewById<ImageView>(R.id.settings_button2)
-    settingsButton2.setOnClickListener {
+    settingsButton2?.setOnClickListener {
       getUserInputs(it)
     }
 

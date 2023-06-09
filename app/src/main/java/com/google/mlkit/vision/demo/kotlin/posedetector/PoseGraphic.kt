@@ -97,13 +97,13 @@ internal constructor(
     // start w/ knee angle, how far is it from ideal 95--135 ?
     var toSay: String = "";
     val jointAngleNow = CameraXLivePreviewActivity.currentAngles[jointIndex]
-    toSay += " at %.0f degrees, your %s angle is".format( jointAngleNow, jointNAME[jointIndex])
+    toSay += " regarding your %s, its angle of %.0f degrees is ".format( jointNAME[jointIndex], jointAngleNow)
     if( jointAngleNow < (CameraXLivePreviewActivity.optimumAngles[jointIndex] - 5.0)) {
-      toSay += " too narrow, please %s a little bit. ".format( increaseAction)
+      toSay += "too narrow, please %s a little bit. ".format( increaseAction)
     } else if( jointAngleNow > (CameraXLivePreviewActivity.optimumAngles[jointIndex] + 5.0)) {
-      toSay += " too wide, please %s a little bit. ".format( decreaseAction)
+      toSay += "too wide, please %s a little bit. ".format( decreaseAction)
     } else {
-      toSay += " already good! ".format( jointNAME[jointIndex])
+      toSay += "very good. ".format( jointNAME[jointIndex])
     }
     return toSay
   }
@@ -127,11 +127,14 @@ internal constructor(
     }
     ++CameraXLivePreviewActivity.numAngleVals[jointIndex]
     if( (jointIndex == SkeletalJoint.KNEE.ordinal) && (CameraXLivePreviewActivity.numAngleVals[jointIndex] == 40) ){
-      var toSay = "OK! here is my advice to get you to an optimal posture : "
+      var toSay = "OK! from what I've seen, and "
       toSay += sayAdvice( SkeletalJoint.KNEE.ordinal, "move backward", "move forward")
-      toSay += sayAdvice( SkeletalJoint.HIP.ordinal, "recline backward", "recline forward")
-//      sayAdvice( SkeletalJoint.KNEE.ordinal, "move backward", "move forward")
+      toSay += "I wait for 5 seconds. "
       CameraXLivePreviewActivity.tts!!.speak(toSay, TextToSpeech.QUEUE_FLUSH, null,"")
+      CameraXLivePreviewActivity.tts?.playSilentUtterance(5000, TextToSpeech.QUEUE_ADD, "pause")
+      toSay = "Now, "
+      toSay += sayAdvice( SkeletalJoint.HIP.ordinal, "recline backward", "recline forward")
+      CameraXLivePreviewActivity.tts!!.speak(toSay, TextToSpeech.QUEUE_ADD, null,"")
     }
     canvas.drawText(
       "%d %s %.0f°".format( CameraXLivePreviewActivity.numAngleVals[jointIndex], CameraXLivePreviewActivity.jointsNames[jointIndex], CameraXLivePreviewActivity.currentAngles[jointIndex]),
